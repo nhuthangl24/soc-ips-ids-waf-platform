@@ -1,83 +1,59 @@
 # Hệ thống SOC - IPS / IDS / WAF
 
-> Hệ thống giám sát và phòng thủ an ninh mạng nhiều lớp, tích hợp SOC, IDS, IPS và WAF
+> Kiến trúc hệ thống được cập nhật theo sơ đồ mạng mới nhất
 
-==================================================
-TỔNG QUAN
-==================================================
+---
 
-Đây là hệ thống bảo mật mạng được xây dựng theo mô hình nhiều lớp
-nhằm giám sát, phát hiện và ngăn chặn các cuộc tấn công mạng theo
-thời gian thực.
+## Tổng quan
 
-Thành phần chính:
-- pfSense + IPS
-- DMZ Zone
-- Web Server
-- IDS Server
-- Database
-- SOC / SIEM
+Hệ thống được xây dựng theo mô hình phòng thủ nhiều lớp, tích hợp firewall, IPS, WAF, IDS và hệ thống tập trung log ELK nhằm giám sát, phát hiện và ngăn chặn các mối đe dọa mạng.
 
-==================================================
-KIẾN TRÚC HỆ THỐNG
-==================================================
+## Kiến trúc hệ thống
 
-                    [ Internet / Người dùng ]
-                              |
-                              v
-                +-----------------------------+
-                |       pfSense + IPS         |
-                |     WAN: 75.75.75.x         |
-                |     LAN: 10.0.0.10          |
-                +-----------------------------+
-                              |
-            -----------------------------------------
-            |                                       |
-            v                                       v
-    +--------------------+               +--------------------+
-    |      Vùng DMZ      |               |   Vùng bảo mật     |
-    |   192.168.50.0     |               |   SOC / SIEM       |
-    +--------------------+               +--------------------+
-            |
-    ----------------------------
-    |            |             |
-    v            v             v
- Web Server   IDS Server    Database
+```text
+[Attacker] --> [Internet] --> [pfSense + IPS]
+                               WAN: .75.249
+                               LAN: .10.10
+                                      |
+                         NAT 80/443 -> 192.168.30.40
+                                      |
+                                [DMZ - WAF]
+                               192.168.30.40
+                                      |
+                     -------------------------------
+                     |                             |
+                     v                             v
+            [DMZ-WEB]                     [Vùng bảo mật]
+      Web: 192.168.20.30                ELK: 192.168.40.60
+      DB : 192.168.20.50                Nguồn log:
+                                         - WAF -> ELK
+                                         - IDS -> ELK
+                                         - pfSense + IPS -> ELK
 
-==================================================
-CHỨC NĂNG CHÍNH
-==================================================
+               IDS Server: 192.168.40.50
+```
 
-[1] pfSense + IPS
-- Firewall
-- NAT / Routing
-- Chặn truy cập trái phép
-- Lọc packet độc hại
+## Thành phần hệ thống
 
-[2] IDS Server
-- Phát hiện xâm nhập
-- Giám sát traffic
-- Cảnh báo bất thường
+* pfSense + IPS
+* WAF (DMZ)
+* Web Server
+* Database Server
+* IDS Server
+* ELK Stack
 
-[3] Web Server
-- Cung cấp dịch vụ web
-- Chạy ứng dụng
+## Luồng dữ liệu
 
-[4] Database
-- Lưu trữ dữ liệu
-- Lưu log truy cập
+* Lưu lượng từ bên ngoài đi qua pfSense + IPS
+* Request HTTP/HTTPS được NAT tới WAF
+* WAF lọc và chuyển tiếp lưu lượng sạch tới Web Server
+* IDS giám sát lưu lượng nội bộ
+* Toàn bộ log được tập trung về ELK
 
-[5] SOC / SIEM
-- Thu thập log
-- Dashboard giám sát
-- Cảnh báo thời gian thực
+## Mục tiêu
 
-==================================================
-MỤC TIÊU
-==================================================
-
-- Phát hiện tấn công
-- Ngăn chặn xâm nhập
-- Giám sát tập trung
-- Phân tích log
-- Hỗ trợ phản ứng sự cố
+* Ngăn chặn xâm nhập
+* Bảo vệ ứng dụng web
+* Giám sát lưu lượng mạng
+* Phân tích log tập trung
+* Hỗ trợ phản ứng sự cố
