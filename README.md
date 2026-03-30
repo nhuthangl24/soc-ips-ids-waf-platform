@@ -1,1 +1,0 @@
-# soc-ips-ids-waf-platform
