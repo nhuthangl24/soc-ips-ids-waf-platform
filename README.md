@@ -10,8 +10,8 @@ Dự án mô phỏng một hệ thống phòng thủ an ninh mạng nhiều lớ
 
 Vui lòng xem các tài liệu bên dưới để đọc chi tiết theo ngôn ngữ mong muốn:
 
-* [**README_VI.md**](https://github.com/nhuthangl24/soc-ips-ids-waf-platform/blob/main/README_VI.md): Tài liệu chi tiết tiếng Việt
-* [**README_EN.md**](https://github.com/nhuthangl24/soc-ips-ids-waf-platform/blob/main/README_EN.md): Detailed documentation in English
+* [**README_VI.md**](https://github.com/nhuthangl24/soc-ips-ids-waf-platform/blob/main/README_VI.md) : Tài liệu chi tiết tiếng Việt
+* [**README_EN.md**](https://github.com/nhuthangl24/soc-ips-ids-waf-platform/blob/main/README_EN.md) : Detailed documentation in English
 
 ## Nội dung chính của dự án
 
