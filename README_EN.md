@@ -87,4 +87,4 @@
 
 # Under Preparation
 
-* Information and content are being updated and will be added as soon as possible
+> Information and content are being updated and will be added as soon as possible
