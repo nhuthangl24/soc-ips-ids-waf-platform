@@ -8,6 +8,15 @@
 
 Dự án mô phỏng một hệ thống phòng thủ an ninh mạng nhiều lớp, bao gồm firewall, WAF, IDS/IPS và trung tâm phân tích log ELK.
 
+# Mục tiêu chính của dự án
+
+- Ngăn chặn xâm nhập từ bên ngoài vào mạng nội bộ
+- Bảo vệ ứng dụng web khỏi các tấn công phổ biến (SQLi, XSS, RCE)
+- Giám sát và phân tích lưu lượng mạng theo thời gian thực
+- Tập trung và phân tích log để hỗ trợ phản ứng sự cố
+- Đảm bảo tính sẵn sàng cao của các dịch vụ quan trọng
+
+
 ## Tài liệu chi tiết
 
 Vui lòng xem các tài liệu bên dưới để đọc chi tiết theo ngôn ngữ mong muốn:
@@ -15,18 +24,8 @@ Vui lòng xem các tài liệu bên dưới để đọc chi tiết theo ngôn n
 * [**README_VI.md**](https://github.com/nhuthangl24/soc-ips-ids-waf-platform/blob/main/README_VI.md) : Tài liệu chi tiết tiếng Việt
 * [**README_EN.md**](https://github.com/nhuthangl24/soc-ips-ids-waf-platform/blob/main/README_EN.md) : Detailed documentation in English
 
-## Nội dung chính của dự án
 
-* pfSense + IPS
-* WAF tại vùng DMZ
-* Web Server và Database
-* IDS Server giám sát mạng nội bộ
-* ELK Stack tập trung log và dashboard SOC
 
-## Mục tiêu
-
-README này đóng vai trò trang điều hướng chính của repository.
-Người dùng có thể bắt đầu từ đây và truy cập sang các tài liệu chi tiết để xem kiến trúc, luồng dữ liệu và mô tả thành phần hệ thống.
 
 ## Đóng góp
 
