@@ -1,6 +1,7 @@
 # SOC - IPS / IDS / WAF Security Monitoring System
 
 > Thông tin và nội dung đang được cập nhật, sẽ bổ sung trong thời gian sớm nhất
+
 > Information and content are being updated and will be added as soon as possible
 
 ## Giới thiệu
