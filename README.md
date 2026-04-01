@@ -1,5 +1,7 @@
 # SOC - IPS / IDS / WAF Security Monitoring System
 
+> Thông tin và nội dung đang được cập nhật, sẽ bổ sung trong thời gian sớm nhất
+
 ## Giới thiệu
 
 Đây là trang tổng quan của dự án, giúp người đọc nắm nhanh kiến trúc, mục tiêu và điều hướng tới các tài liệu chi tiết.
