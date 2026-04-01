@@ -1,59 +1,90 @@
 # Hệ thống SOC - IPS / IDS / WAF
 
-> Kiến trúc hệ thống được cập nhật theo sơ đồ mạng mới nhất
+# Mục tiêu
 
----
+* Ngăn chặn xâm nhập từ bên ngoài vào mạng nội bộ
+* Bảo vệ ứng dụng web khỏi các tấn công phổ biến (SQLi, XSS, RCE)
+* Giám sát và phân tích lưu lượng mạng theo thời gian thực
+* Tập trung và phân tích log để hỗ trợ phản ứng sự cố
+* Đảm bảo tính sẵn sàng cao của các dịch vụ quan trọng
 
-## Tổng quan
+# Thành phần hệ thống
 
-Hệ thống được xây dựng theo mô hình phòng thủ nhiều lớp, tích hợp firewall, IPS, WAF, IDS và hệ thống tập trung log ELK nhằm giám sát, phát hiện và ngăn chặn các mối đe dọa mạng.
+* **pfSense + IPS**: firewall, NAT, giám sát lưu lượng mạng, IPS rules
+* **WAF (DMZ)**: bảo vệ ứng dụng web, lọc các request HTTP/HTTPS độc hại
+* **Web Server**: host các website và ứng dụng web nội bộ
+* **Database Server**: lưu trữ dữ liệu ứng dụng
+* **IDS Server**: giám sát lưu lượng nội bộ, phát hiện xâm nhập
+* **ELK Stack**: thu thập, tập trung và phân tích log từ tất cả các thiết bị và dịch vụ
 
-## Kiến trúc hệ thống
+# Luồng dữ liệu
 
-```text
-[Attacker] --> [Internet] --> [pfSense + IPS]
-                               WAN: .75.249
-                               LAN: .10.10
-                                      |
-                         NAT 80/443 -> 192.168.30.40
-                                      |
-                                [DMZ - WAF]
-                               192.168.30.40
-                                      |
-                     -------------------------------
-                     |                             |
-                     v                             v
-            [DMZ-WEB]                     [Vùng bảo mật]
-      Web: 192.168.20.30                ELK: 192.168.40.60
-      DB : 192.168.20.50                Nguồn log:
-                                         - WAF -> ELK
-                                         - IDS -> ELK
-                                         - pfSense + IPS -> ELK
+* Lưu lượng từ bên ngoài đi qua **pfSense + IPS** để lọc và giám sát
+* Request HTTP/HTTPS được NAT tới **WAF** trong DMZ
+* WAF lọc request độc hại và chuyển tiếp lưu lượng sạch tới **Web Server**
+* **IDS Server** giám sát lưu lượng nội bộ, phát hiện hành vi bất thường
+* Toàn bộ log từ firewall, WAF, Web Server, Database và IDS được gửi về **ELK Stack** để phân tích
 
-               IDS Server: 192.168.40.50
-```
+# Sơ đồ mạng
 
-## Thành phần hệ thống
+* Ảnh sơ đồ mạng tổng quan
+* File cấu hình mạng (VMware / PFSENSE)
+* Mô tả chi tiết các subnet: WAN, LAN, DMZ và các IP tĩnh cho từng máy ảo
 
-* pfSense + IPS
-* WAF (DMZ)
-* Web Server
-* Database Server
-* IDS Server
-* ELK Stack
+# Cài đặt PFSENSE
 
-## Luồng dữ liệu
+* Tạo máy ảo PFSENSE trên VMware
+* Cấu hình các interface: LAN, WAN, DMZ
+* Thiết lập **Firewall Rules** cơ bản theo từng interface
+* NAT / Port Forward cho các dịch vụ Web Server và DVWA
+* Cấu hình IPS để phát hiện và chặn các xâm nhập
 
-* Lưu lượng từ bên ngoài đi qua pfSense + IPS
-* Request HTTP/HTTPS được NAT tới WAF
-* WAF lọc và chuyển tiếp lưu lượng sạch tới Web Server
-* IDS giám sát lưu lượng nội bộ
-* Toàn bộ log được tập trung về ELK
+# Triển khai dịch vụ web
 
-## Mục tiêu
+## Windows Server + IIS
 
-* Ngăn chặn xâm nhập
-* Bảo vệ ứng dụng web
-* Giám sát lưu lượng mạng
-* Phân tích log tập trung
-* Hỗ trợ phản ứng sự cố
+* Thiết lập IP tĩnh trong DMZ
+* Cài IIS 10 và deploy site mẫu
+* Kiểm tra truy cập từ LAN, DMZ và WAN
+
+## Ubuntu + DVWA / Docker
+
+* Thiết lập IP tĩnh trong DMZ
+* Cài Docker và chạy container DVWA
+* Kiểm tra truy cập web từ LAN, DMZ, WAN
+
+# Triển khai SOC
+
+* Cài đặt công cụ SOC (ELK, Wazuh, Graylog...)
+* Thu thập logs từ pfSense, WAF, Web Server, Database, IDS
+* Cấu hình dashboards, cảnh báo theo các rule bảo mật
+* Giám sát tình trạng mạng và sự cố theo thời gian thực
+
+# Cài đặt IPS / IDS
+
+* Cài Snort hoặc Suricata
+* Thiết lập rule cơ bản để phát hiện các xâm nhập mạng, malware, exploit
+* Kết hợp với SOC để gửi alert và ghi log tập trung
+
+# Triển khai WAF
+
+* Cài ModSecurity hoặc WAF tương thích với IIS / Web Server
+* Thiết lập policy để bảo vệ các endpoint web
+* Kiểm tra hiệu quả lọc các request độc hại
+
+# High Availability (HA)
+
+* Thiết lập **pfSense HA** với CARP VIP để đảm bảo failover cho firewall
+* Backup và failover cho các máy chủ quan trọng
+* Kiểm tra tính khả dụng của dịch vụ trong trường hợp lỗi
+
+# Kiểm tra & đánh giá
+
+* Ping test từ LAN/DMZ → WAN
+* Truy cập các dịch vụ web từ WAN
+* Kiểm tra alert SOC / IPS / IDS / WAF
+* Đánh giá failover HA và tính sẵn sàng dịch vụ
+
+# Đang chuẩn bị
+
+> Thông tin và nội dung đang được cập nhật, sẽ bổ sung trong thời gian sớm nhất
