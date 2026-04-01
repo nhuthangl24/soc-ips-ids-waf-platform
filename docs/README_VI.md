@@ -21,15 +21,15 @@
 
 Dưới đây là sơ đồ mạng tổng quan về dự án
 
-![Sơ đồ mạng](./img/network_map.png)
+![Sơ đồ mạng](../img/network_map.png)
 
 Trên sơ đồ có thể thấy các thiết bị/thành phần chính gồm: pfSense + IPS (chính/backup), WAF, Web Server, Database, IDS Server, ELK (SIEM), cùng các vùng WAN/LAN/DMZ.
 
 Sau khi nắm được sơ đồ, dưới đây là cấu hình VMware Virtual Network (VMnet) và các subnet ảo dùng trong bài lab.
 
-![IP](./img/ip.png)
+![IP](../img/ip.png)
 
-Đây là file cấu hình mạng cho ai quan tâm có thể dùng file cấu hình này để import và dựng đúng như sơ đồ trên: [SOC NETWORK LAB](./files/SOC_NETWORK)
+Đây là file cấu hình mạng cho ai quan tâm có thể dùng file cấu hình này để import và dựng đúng như sơ đồ trên: [SOC NETWORK LAB](../files/SOC_NETWORK)
 
 ## Network Subnet Design
 

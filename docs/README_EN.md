@@ -29,15 +29,15 @@
 
 Below is the overall network diagram of the project.
 
-![Network Diagram](./img/network_map.png)
+![Network Diagram](../img/network_map.png)
 
 As shown in the diagram, the main devices/components include: pfSense + IPS (primary/backup), WAF, Web Server, Database, IDS Server, ELK (SIEM), along with the WAN/LAN/DMZ zones.
 
 After understanding the diagram, below is the VMware Virtual Network (VMnet) configuration and the virtual subnets used in this lab.
 
-![IP](./img/ip.png)
+![IP](../img/ip.png)
 
-This is the network configuration file for anyone interested, which can be used to import and build the environment exactly as shown in the diagram: [SOC NETWORK LAB](./files/SOC_NETWORK)
+This is the network configuration file for anyone interested, which can be used to import and build the environment exactly as shown in the diagram: [SOC NETWORK LAB](../files/SOC_NETWORK)
 
 ## Network Subnet Design
 
