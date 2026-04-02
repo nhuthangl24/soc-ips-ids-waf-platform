@@ -185,7 +185,7 @@ Sau khi truy cập thành công vào pfSense, bước đầu tiên là thực hi
 
 ![UPDATE_pfSense](../images/UPDATE/UPDATE_pfsense3.png)
 
-- Nếu bị lỗi `Unable to check for updates` thì làm theo các bước sau'
+- Nếu bị lỗi `Unable to check for updates` thì làm theo các bước sau
 
 - Chọn `Diagnostics` -> `Command Prompt` và dán các lệnh sau vào ô `Execute Shell Command`
 
