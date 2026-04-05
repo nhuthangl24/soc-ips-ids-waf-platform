@@ -177,7 +177,6 @@ Sau khi truy cập thành công vào pfSense, bước đầu tiên là thực hi
 
 - Chọn `System` -> `Update`
 
-![UPDATE_pfSense](../images/UPDATE/UPDATE_pfsense2.png)
 
 - Sau khi vào phần `Update` bấm vào `Branch` và chọn `Current Stable Version (2.8.1)` (Hiện tại phiên bản 2.8.1 là bản mới nhất khi làm bài lab này)
 
