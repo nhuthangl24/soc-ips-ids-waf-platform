@@ -298,13 +298,13 @@ Sau khi truy cập thành công vào pfSense, bước đầu tiên là thực hi
 - Lưu ý: Trong cấu hình NAT Port Forward, địa chỉ `192.168.75.242` được sử dụng thay vì địa chỉ WAN vật lý như `192.168.75.131` vì đây là mô hình HA Firewall gồm 1 Master và 1 Backup. Địa chỉ `192.168.75.242 `là **CARP VIP** (Virtual IP), đóng vai trò địa chỉ đại diện cho cả cụm firewall. Ở trạng thái bình thường, VIP sẽ được gán cho Master Firewall để xử lý lưu lượng. Khi Master gặp sự cố hoặc ngừng hoạt động, Backup Firewall sẽ tự động tiếp quản VIP và tiếp tục xử lý kết nối mà không làm gián đoạn dịch vụ. Vì vậy, các rule NAT và truy cập từ bên ngoài luôn phải trỏ tới **CARP VIP** thay vì IP vật lý của từng firewall nhằm đảm bảo khả năng failover và tính sẵn sàng cao của hệ thống. (Xem mục **High Availability (HA)** sẽ hiểu CARP VIP là gì)
 
 ## Cấu hình IPS để phát hiện và chặn các xâm nhập
-- Đầu tiên vào **System** -> **Package Manager** để tải **Suricata**
+- Đầu tiên vào **System** -> **Package Manager** để tải và cài đạt **Suricata**
 
 ![IPS](../images/IPS/IPS.png)
 
 ![IPS](../images/IPS/IPS_1.png)
 
-- Chọn **ADD** và cấu hình giống các thông số dưới đây 
+- Sau khi tải và cài đạt xong **Suricata** thì vào **Services** -> **Suricata** và chọn **ADD** và cấu hình giống các thông số dưới đây 
 
 ![IPS](../images/IPS/IPS_2.png)
 
