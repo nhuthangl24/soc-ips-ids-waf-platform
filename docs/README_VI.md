@@ -177,7 +177,6 @@ Sau khi truy cập thành công vào pfSense, bước đầu tiên là thực hi
 
 - Chọn `System` -> `Update`
 
-
 - Sau khi vào phần `Update` bấm vào `Branch` và chọn `Current Stable Version (2.8.1)` (Hiện tại phiên bản 2.8.1 là bản mới nhất khi làm bài lab này)
 
 ![UPDATE_pfSense](../images/UPDATE/UPDATE_pfsense3.png)
@@ -296,48 +295,6 @@ Sau khi truy cập thành công vào pfSense, bước đầu tiên là thực hi
 
 - Lưu ý: Trong cấu hình NAT Port Forward, địa chỉ `192.168.75.242` được sử dụng thay vì địa chỉ WAN vật lý như `192.168.75.131` vì đây là mô hình HA Firewall gồm 1 Master và 1 Backup. Địa chỉ `192.168.75.242 `là **CARP VIP** (Virtual IP), đóng vai trò địa chỉ đại diện cho cả cụm firewall. Ở trạng thái bình thường, VIP sẽ được gán cho Master Firewall để xử lý lưu lượng. Khi Master gặp sự cố hoặc ngừng hoạt động, Backup Firewall sẽ tự động tiếp quản VIP và tiếp tục xử lý kết nối mà không làm gián đoạn dịch vụ. Vì vậy, các rule NAT và truy cập từ bên ngoài luôn phải trỏ tới **CARP VIP** thay vì IP vật lý của từng firewall nhằm đảm bảo khả năng failover và tính sẵn sàng cao của hệ thống. (Xem mục **High Availability (HA)** sẽ hiểu CARP VIP là gì)
 
-## Cấu hình IPS để phát hiện và chặn các xâm nhập
-- Đầu tiên vào **System** -> **Package Manager** để tải và cài đạt **Suricata**
-
-![IPS](../images/IPS/IPS.png)
-
-![IPS](../images/IPS/IPS_1.png)
-
-- Sau khi tải và cài đạt xong **Suricata** thì vào **Services** -> **Suricata** và chọn **ADD** và cấu hình giống các thông số dưới đây 
-
-![IPS](../images/IPS/IPS_2.png)
-
-
-| Nhóm cấu hình        | Trường                     | Giá trị                 | Ý nghĩa                                   |
-| -------------------- | -------------------------- | ----------------------- | ----------------------------------------- |
-| **General Settings** | Enable                     | `Checked`               | Kích hoạt Suricata trên interface         |
-|                      | Interface                  | `WAN (em0)`             | Giám sát lưu lượng đi vào từ Internet     |
-|                      | Description                | `WAN`                   | Mô tả cho instance                        |
-| **Logging Settings** | Send Alerts to System Log  | `Checked`               | Gửi cảnh báo vào system log của pfSense   |
-|                      | Enable Stats Collection    | `Unchecked`             | Không thu thập thống kê hiệu năng định kỳ |
-|                      | Enable HTTP Log            | `Checked`               | Ghi log HTTP traffic đã giải mã           |
-|                      | HTTP Log File Type         | `Regular`               | Ghi log vào file thông thường             |
-|                      | Append HTTP Log            | `Checked`               | Ghi nối tiếp log khi restart              |
-|                      | Log Extended HTTP Info     | `Checked`               | Ghi chi tiết HTTP header / method / URI   |
-|                      | Enable TLS Log             | `Unchecked`             | Không ghi log TLS handshake               |
-|                      | Enable File-Store          | `Unchecked`             | Không trích xuất file từ traffic          |
-|                      | Enable Packet Log          | `Unchecked`             | Không lưu pcap packet log                 |
-|                      | Enable Verbose Logging     | `Unchecked`             | Không ghi log chi tiết khi khởi động      |
-| **EVE Output**       | EVE JSON Log               | `Unchecked`             | Không xuất log JSON                       |
-| **Alert & Block**    | Block Offenders            | `Checked/As configured` | Tự động block IP sinh cảnh báo            |
-| **Performance**      | Run Mode                   | `AutoFP`                | Chạy đa luồng, tối ưu cho IDS             |
-|                      | AutoFP Scheduler           | `Hash`                  | Phân luồng theo hash flow                 |
-|                      | Max Pending Packets        | `1024`                  | Số packet chờ xử lý tối đa                |
-|                      | Detect Engine Profile      | `Medium`                | Cân bằng giữa hiệu năng và RAM            |
-|                      | MPM Algorithm              | `Auto`                  | Tự chọn thuật toán match tốt nhất         |
-|                      | SPM Algorithm              | `Auto`                  | Tự chọn single-pattern matcher            |
-|                      | Inspection Recursion Limit | `3000`                  | Giới hạn đệ quy khi inspect               |
-|                      | Promiscuous Mode           | `Checked`               | Bắt toàn bộ traffic đi qua interface      |
-|                      | PCAP Snaplen               | `1518`                  | Kích thước packet capture tối đa          |
-| **Networks**         | Home Net                   | `default`               | Các mạng nội bộ / VIP cần bảo vệ          |
-|                      | External Net               | `default`               | Mạng ngoài Internet                       |
-| **Filtering**        | Suppression                | `default`               | Không suppression custom                  |
-
 # High Availability (HA)
 
 - Thiết lập **pfSense HA** với CARP VIP để đảm bảo failover cho firewall
@@ -385,15 +342,52 @@ Sau khi truy cập thành công vào pfSense, bước đầu tiên là thực hi
 
 # Cài đặt IPS / IDS
 
+## Cấu hình IPS để phát hiện và chặn các xâm nhập
+
+- Đầu tiên vào **System** -> **Package Manager** để tải và cài đạt **Suricata**
+
+![IPS](../images/IPS/IPS.png)
+
+![IPS](../images/IPS/IPS_1.png)
+
+- Sau khi tải và cài đạt xong **Suricata** thì vào **Services** -> **Suricata** và chọn **ADD** và cấu hình giống các thông số dưới đây
+
+![IPS](../images/IPS/IPS_2.png)
+
+| Nhóm cấu hình        | Trường                     | Giá trị                 | Ý nghĩa                                   |
+| -------------------- | -------------------------- | ----------------------- | ----------------------------------------- |
+| **General Settings** | Enable                     | `Checked`               | Kích hoạt Suricata trên interface         |
+|                      | Interface                  | `WAN (em0)`             | Giám sát lưu lượng đi vào từ Internet     |
+|                      | Description                | `WAN`                   | Mô tả cho instance                        |
+| **Logging Settings** | Send Alerts to System Log  | `Checked`               | Gửi cảnh báo vào system log của pfSense   |
+|                      | Enable Stats Collection    | `Unchecked`             | Không thu thập thống kê hiệu năng định kỳ |
+|                      | Enable HTTP Log            | `Checked`               | Ghi log HTTP traffic đã giải mã           |
+|                      | HTTP Log File Type         | `Regular`               | Ghi log vào file thông thường             |
+|                      | Append HTTP Log            | `Checked`               | Ghi nối tiếp log khi restart              |
+|                      | Log Extended HTTP Info     | `Checked`               | Ghi chi tiết HTTP header / method / URI   |
+|                      | Enable TLS Log             | `Unchecked`             | Không ghi log TLS handshake               |
+|                      | Enable File-Store          | `Unchecked`             | Không trích xuất file từ traffic          |
+|                      | Enable Packet Log          | `Unchecked`             | Không lưu pcap packet log                 |
+|                      | Enable Verbose Logging     | `Unchecked`             | Không ghi log chi tiết khi khởi động      |
+| **EVE Output**       | EVE JSON Log               | `Unchecked`             | Không xuất log JSON                       |
+| **Alert & Block**    | Block Offenders            | `Checked/As configured` | Tự động block IP sinh cảnh báo            |
+| **Performance**      | Run Mode                   | `AutoFP`                | Chạy đa luồng, tối ưu cho IDS             |
+|                      | AutoFP Scheduler           | `Hash`                  | Phân luồng theo hash flow                 |
+|                      | Max Pending Packets        | `1024`                  | Số packet chờ xử lý tối đa                |
+|                      | Detect Engine Profile      | `Medium`                | Cân bằng giữa hiệu năng và RAM            |
+|                      | MPM Algorithm              | `Auto`                  | Tự chọn thuật toán match tốt nhất         |
+|                      | SPM Algorithm              | `Auto`                  | Tự chọn single-pattern matcher            |
+|                      | Inspection Recursion Limit | `3000`                  | Giới hạn đệ quy khi inspect               |
+|                      | Promiscuous Mode           | `Checked`               | Bắt toàn bộ traffic đi qua interface      |
+|                      | PCAP Snaplen               | `1518`                  | Kích thước packet capture tối đa          |
+| **Networks**         | Home Net                   | `default`               | Các mạng nội bộ / VIP cần bảo vệ          |
+|                      | External Net               | `default`               | Mạng ngoài Internet                       |
+| **Filtering**        | Suppression                | `default`               | Không suppression custom                  |
+
 - Cài Snort hoặc Suricata
 - Thiết lập rule cơ bản để phát hiện các xâm nhập mạng, malware, exploit
 - Kết hợp với SOC để gửi alert và ghi log tập trung
 
-# Triển khai WAF
-
-- Cài ModSecurity hoặc WAF tương thích với IIS / Web Server
-- Thiết lập policy để bảo vệ các endpoint web
-- Kiểm tra hiệu quả lọc các request độc hại
 
 # Kiểm tra & đánh giá
 
