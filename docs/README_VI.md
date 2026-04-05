@@ -87,8 +87,6 @@ Sau khi cài xong ta vào VMWARE để tiến hành cài đạt pfSense
 
 ![pfSense_02](../images/INSTALL/pfsense_02.png)
 
-- **Chính các thông số như sau :**
-
 ## Chính các thông số như sau :
 
 | Component             | Configuration                         |
@@ -145,8 +143,8 @@ Sau khi truy cập thành công vào pfSense, bước đầu tiên là thực hi
 ![GUI_PFSENSE](../images/GUI/GUI_pfsense.png)
 
 - Ở bước này ta cấu hình hostname tuỳ ý ở bài lab này sẽ để mặc định là `pfSense`
-- Primary DNS Server : 8.8.8.8 (Hoặc bỏ trống)
-- Secondary DNS Server : 8.8.4.4 (Hoặc bỏ trống)
+- Primary DNS Server : `8.8.8.8` (Hoặc bỏ trống)
+- Secondary DNS Server : `8.8.4.4` (Hoặc bỏ trống)
 
 ![GUI_PFSENSE](../images/GUI/GUI_pfsense1.png)
 
@@ -173,7 +171,7 @@ Sau khi truy cập thành công vào pfSense, bước đầu tiên là thực hi
 
 ## Cập nhật pfSense lên bản mới nhất
 
-Để thuận tiện việc có thể làm 1 bài lab suôn sẻ, cần cập nhật pfSense lên phiên bản mới nhất để tránh phát sinh lỗi xảy ra khi làm lab , đưới đây là các bước để cập nhật pfSense
+Để thuận tiện việc có thể làm 1 bài lab suôn sẻ, cần cập nhật pfSense lên phiên bản mới nhất để tránh phát sinh lỗi xảy ra khi làm lab , dưới đây là các bước để cập nhật pfSense
 
 ![UPDATE_pfSense](../images/UPDATE/UPDATE_pfsense1.png)
 
@@ -218,19 +216,43 @@ Sau khi truy cập thành công vào pfSense, bước đầu tiên là thực hi
 - NAT / Port Forward cho các dịch vụ Web Server và DVWA
 - Cấu hình IPS để phát hiện và chặn các xâm nhập
 
-# Triển khai dịch vụ web
+# High Availability (HA)
 
-## Windows Server + IIS
+- Thiết lập **pfSense HA** với CARP VIP để đảm bảo failover cho firewall
+- Backup và failover cho các máy chủ quan trọng
+- Kiểm tra tính khả dụng của dịch vụ trong trường hợp lỗi
 
-- Thiết lập IP tĩnh trong DMZ
-- Cài IIS 10 và deploy site mẫu
-- Kiểm tra truy cập từ LAN, DMZ và WAN
+# Triển khai hệ thống theo từng thành phần
 
-## Ubuntu + DVWA / Docker
+## Triển khai Web Server (DMZ-WEB)
 
-- Thiết lập IP tĩnh trong DMZ
-- Cài Docker và chạy container DVWA
-- Kiểm tra truy cập web từ LAN, DMZ, WAN
+- Thiết lập IP tĩnh cho **Ubuntu Web Server (192.168.20.30)**
+- Cài đặt **Docker / Docker Compose**
+- Khởi chạy container **DVWA** để mô phỏng ứng dụng web dễ bị tấn công
+- Kiểm tra dịch vụ HTTP/HTTPS hoạt động nội bộ
+
+## Triển khai WAF (DMZ)
+
+- Cấu hình **WAF (192.168.30.40)** tại vùng DMZ
+- Thiết lập rule lọc **SQL Injection, XSS, LFI/RFI**
+- Chuyển tiếp lưu lượng từ WAN vào Web Server thông qua WAF
+
+## Triển khai IDS Monitoring
+
+- Cấu hình **IDS Server (192.168.40.50)**
+- Thu thập log và phát hiện tấn công mạng
+- Giám sát traffic từ DMZ và Security Zone
+
+## Tích hợp ELK Logging
+
+- Gửi log từ **pfSense, WAF, Web Server, IDS** về **ELK Server (192.168.40.60)**
+- Kiểm tra dashboard, alert và timeline sự kiện
+
+## Kiểm tra truy cập và giám sát
+
+- Kiểm tra truy cập từ **LAN / DMZ / WAN**
+- Mô phỏng tấn công DVWA và xác minh log xuất hiện trên ELK
+- Đối chiếu cảnh báo giữa IPS, IDS và WAF
 
 # Triển khai SOC
 
@@ -250,12 +272,6 @@ Sau khi truy cập thành công vào pfSense, bước đầu tiên là thực hi
 - Cài ModSecurity hoặc WAF tương thích với IIS / Web Server
 - Thiết lập policy để bảo vệ các endpoint web
 - Kiểm tra hiệu quả lọc các request độc hại
-
-# High Availability (HA)
-
-- Thiết lập **pfSense HA** với CARP VIP để đảm bảo failover cho firewall
-- Backup và failover cho các máy chủ quan trọng
-- Kiểm tra tính khả dụng của dịch vụ trong trường hợp lỗi
 
 # Kiểm tra & đánh giá
 
