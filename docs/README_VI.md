@@ -29,7 +29,7 @@ Sau khi nắm được sơ đồ, dưới đây là cấu hình VMware Virtual N
 
 ![IP](../images/ip.png)
 
-Đây là file cấu hình mạng cho ai quan tâm có thể dùng file cấu hình này để import và dựng đúng như sơ đồ trên: [SOC NETWORK LAB](../files/SOC_NETWORK)
+Đây là file cấu hình mạng cho ai quan tâm có thể dùng file cấu hình này để import và dựng đúng như sơ đồ trên: [SOC NETWORK LAB](../files)
 
 ## Network Subnet Design
 
