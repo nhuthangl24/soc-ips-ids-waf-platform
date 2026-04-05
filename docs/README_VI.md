@@ -212,9 +212,132 @@ Sau khi truy cập thành công vào pfSense, bước đầu tiên là thực hi
 
 ![UPDATE_pfSense](../images/UPDATE/UPDATE_pfsense10.png)
 
-- Thiết lập **Firewall Rules** cơ bản theo từng interface
-- NAT / Port Forward cho các dịch vụ Web Server và DVWA
-- Cấu hình IPS để phát hiện và chặn các xâm nhập
+## Thiết lập **Firewall Rules** cơ bản theo từng interface
+
+- Nếu muốn truy cập pfSense từ WAN thì thiết lập rule như dưới đây
+
+![pfSense_Rules](../images/Rules/Rule_7.png)
+
+- Chọn **Add** và điền các thông số giống như sau
+
+| Trường             | Giá trị cấu hình | Mô tả                                                                 |
+| ------------------ | ---------------- | --------------------------------------------------------------------- |
+| **Action**         | `Pass`           | Cho phép các gói tin thỏa mãn điều kiện của rule được đi qua firewall |
+| **Interface**      | `WAN`            | Áp dụng rule cho lưu lượng đi vào từ cổng WAN                         |
+| **Address Family** | `IPv4`           | Rule áp dụng cho địa chỉ IPv4                                         |
+| **Protocol**       | `Any`            | Áp dụng cho mọi giao thức (TCP, UDP, ICMP,...)                        |
+| **Source**         | `Any`            | Chấp nhận gói tin từ mọi địa chỉ nguồn                                |
+| **Destination**    | `Any`            | Cho phép đi đến mọi địa chỉ đích                                      |
+
+- Sau khi thiết lập các thông số như trên thì bấm **Save** để lưu lại và thử truy cập lại vào **pfSense** từ cổng **WAN**
+
+![pfSense_Rules](../images/Rules/Rule_9.png)
+
+- **Ở bài lab này không set Rule truy cập từ cổng WAN vào pfSense nên sẽ không có rule đó**
+
+![pfSense_Rules](../images/Rules/Rule_1.png)
+
+- Tại LAN tạo các Rules như sau
+
+| STT | Trạng thái | Protocol   | Source        | Source Port | Destination     | Dest Port   | Ý nghĩa                                                                     |
+| --- | ---------- | ---------- | ------------- | ----------- | --------------- | ----------- | --------------------------------------------------------------------------- |
+| 1   | Allow      | `*`        | `*`           | `*`         | `LAN Address`   | `2402`      | Cho phép truy cập vào pfSense qua cổng quản trị để tránh tự khóa chính mình |
+| 2   | Block      | `IPv4 TCP` | `LAN subnets` | `*`         | `192.168.20.30` | `80 (HTTP)` | Chặn máy trong LAN truy cập web server tại IP `192.168.20.30` qua port `80` |
+| 3   | Allow      | `IPv4 *`   | `LAN subnets` | `*`         | `*`             | `*`         | Cho phép toàn bộ máy trong LAN truy cập mọi nơi                             |
+| 4   | Allow      | `IPv6 *`   | `LAN subnets` | `*`         | `*`             | `*`         | Cho phép truy cập toàn bộ bằng IPv6                                         |
+
+![pfSense_Rules](../images/Rules/Rule_2.png)
+
+- Tại DMZ tạo các Rules như sau
+
+| STT | Trạng thái | Protocol | Source          | Source Port | Destination     | Dest Port   | Action | Ý nghĩa                                                |
+| --- | ---------- | -------- | --------------- | ----------- | --------------- | ----------- | ------ | ------------------------------------------------------ |
+| 1   | Allow      | IPv4 TCP | `192.168.30.40` | `*`         | `192.168.20.30` | `80 (HTTP)` | Pass   | Cho phép WAF/host cụ thể truy cập Web Server trong DMZ |
+| 2   | Block      | IPv4 \*  | `*`             | `*`         | `192.168.20.30` | `*`         | Block  | Chặn toàn bộ truy cập khác tới Web Server              |
+| 3   | Allow      | IPv4 \*  | `DMZ subnets`   | `*`         | `*`             | `*`         | Pass   | Cho phép các máy trong DMZ đi ra ngoài                 |
+
+![pfSense_Rules](../images/Rules/Rule_3.png)
+
+- Tại DMZWAF tạo các Rules như sau
+
+  | STT | Trạng thái | Protocol | Source           | Destination | Action | Ý nghĩa                                            |
+  | --- | ---------- | -------- | ---------------- | ----------- | ------ | -------------------------------------------------- |
+  | 1   | Allow      | IPv4 \_  | `DMZWAF subnets` | `*`         | Pass   | Cho phép toàn bộ subnet WAF truy cập các zone khác |
+
+![pfSense_Rules](../images/Rules/Rule_4.png)
+
+- Phần này sẽ làm lại các rules khác , chưa làm phần này
+
+![pfSense_Rules](../images/Rules/Rule_5.png)
+
+- Tại PFSENSESYNC tạo các Rules như sau
+
+| STT | Trạng thái | Protocol | Source                | Destination | Action | Ý nghĩa                             |
+| --- | ---------- | -------- | --------------------- | ----------- | ------ | ----------------------------------- |
+| 1   | Allow      | IPv4 \*  | `PFSENSESYNC subnets` | `*`         | Pass   | Cho phép đồng bộ HA giữa 2 firewall |
+
+## NAT / Port Forward cho các dịch vụ Web Server
+
+- Vào **Firewall** -> **NAT** -> **Port Forward** và chọn **Add** và chỉnh cấu hình lại như dưới đây
+
+![pfSense_Rules](../images/NAT/NAT_1.png)
+
+| Trường                      | Giá trị            | Mô tả                                      |
+| --------------------------- | ------------------ | ------------------------------------------ |
+| **Interface**               | `WAN`              | Áp dụng cho lưu lượng đi vào từ mạng ngoài |
+| **Address Family**          | `IPv4`             | Chỉ áp dụng cho IPv4                       |
+| **Protocol**                | `TCP/UDP`          | Cho phép cả TCP và UDP                     |
+| **Source**                  | `Any`              | Chấp nhận từ mọi IP nguồn                  |
+| **Destination**             | `192.168.75.242`   | Địa chỉ WAN/VIP public nhận request        |
+| **Destination Port**        | `80 (HTTP)`        | Cổng dịch vụ web                           |
+| **Redirect Target IP**      | `192.168.30.40`    | IP của máy WAF nội bộ                      |
+| **Redirect Target Port**    | `80 (HTTP)`        | Chuyển tiếp sang port HTTP của WAF         |
+| **Description**             | `NAT to WAF (WAN)` | Mô tả rule                                 |
+| **Filter Rule Association** | `Rule NAT to WAF`  | Tự tạo firewall rule đi kèm                |
+
+- Lưu ý: Trong cấu hình NAT Port Forward, địa chỉ `192.168.75.242` được sử dụng thay vì địa chỉ WAN vật lý như `192.168.75.131` vì đây là mô hình HA Firewall gồm 1 Master và 1 Backup. Địa chỉ `192.168.75.242 `là **CARP VIP** (Virtual IP), đóng vai trò địa chỉ đại diện cho cả cụm firewall. Ở trạng thái bình thường, VIP sẽ được gán cho Master Firewall để xử lý lưu lượng. Khi Master gặp sự cố hoặc ngừng hoạt động, Backup Firewall sẽ tự động tiếp quản VIP và tiếp tục xử lý kết nối mà không làm gián đoạn dịch vụ. Vì vậy, các rule NAT và truy cập từ bên ngoài luôn phải trỏ tới **CARP VIP** thay vì IP vật lý của từng firewall nhằm đảm bảo khả năng failover và tính sẵn sàng cao của hệ thống. (Xem mục **High Availability (HA)** sẽ hiểu CARP VIP là gì)
+
+## Cấu hình IPS để phát hiện và chặn các xâm nhập
+- Đầu tiên vào **System** -> **Package Manager** để tải **Suricata**
+
+![IPS](../images/IPS/IPS.png)
+
+![IPS](../images/IPS/IPS_1.png)
+
+- Chọn **ADD** và cấu hình giống các thông số dưới đây 
+
+![IPS](../images/IPS/IPS_2.png)
+
+
+| Nhóm cấu hình        | Trường                     | Giá trị                 | Ý nghĩa                                   |
+| -------------------- | -------------------------- | ----------------------- | ----------------------------------------- |
+| **General Settings** | Enable                     | `Checked`               | Kích hoạt Suricata trên interface         |
+|                      | Interface                  | `WAN (em0)`             | Giám sát lưu lượng đi vào từ Internet     |
+|                      | Description                | `WAN`                   | Mô tả cho instance                        |
+| **Logging Settings** | Send Alerts to System Log  | `Checked`               | Gửi cảnh báo vào system log của pfSense   |
+|                      | Enable Stats Collection    | `Unchecked`             | Không thu thập thống kê hiệu năng định kỳ |
+|                      | Enable HTTP Log            | `Checked`               | Ghi log HTTP traffic đã giải mã           |
+|                      | HTTP Log File Type         | `Regular`               | Ghi log vào file thông thường             |
+|                      | Append HTTP Log            | `Checked`               | Ghi nối tiếp log khi restart              |
+|                      | Log Extended HTTP Info     | `Checked`               | Ghi chi tiết HTTP header / method / URI   |
+|                      | Enable TLS Log             | `Unchecked`             | Không ghi log TLS handshake               |
+|                      | Enable File-Store          | `Unchecked`             | Không trích xuất file từ traffic          |
+|                      | Enable Packet Log          | `Unchecked`             | Không lưu pcap packet log                 |
+|                      | Enable Verbose Logging     | `Unchecked`             | Không ghi log chi tiết khi khởi động      |
+| **EVE Output**       | EVE JSON Log               | `Unchecked`             | Không xuất log JSON                       |
+| **Alert & Block**    | Block Offenders            | `Checked/As configured` | Tự động block IP sinh cảnh báo            |
+| **Performance**      | Run Mode                   | `AutoFP`                | Chạy đa luồng, tối ưu cho IDS             |
+|                      | AutoFP Scheduler           | `Hash`                  | Phân luồng theo hash flow                 |
+|                      | Max Pending Packets        | `1024`                  | Số packet chờ xử lý tối đa                |
+|                      | Detect Engine Profile      | `Medium`                | Cân bằng giữa hiệu năng và RAM            |
+|                      | MPM Algorithm              | `Auto`                  | Tự chọn thuật toán match tốt nhất         |
+|                      | SPM Algorithm              | `Auto`                  | Tự chọn single-pattern matcher            |
+|                      | Inspection Recursion Limit | `3000`                  | Giới hạn đệ quy khi inspect               |
+|                      | Promiscuous Mode           | `Checked`               | Bắt toàn bộ traffic đi qua interface      |
+|                      | PCAP Snaplen               | `1518`                  | Kích thước packet capture tối đa          |
+| **Networks**         | Home Net                   | `default`               | Các mạng nội bộ / VIP cần bảo vệ          |
+|                      | External Net               | `default`               | Mạng ngoài Internet                       |
+| **Filtering**        | Suppression                | `default`               | Không suppression custom                  |
 
 # High Availability (HA)
 
